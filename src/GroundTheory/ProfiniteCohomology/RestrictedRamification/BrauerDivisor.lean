@@ -246,7 +246,7 @@ theorem good_single_of_base {ℓ : ℕ} (v : {v : HeightOneSpectrum (𝓞 K.1) /
   induction' hn : (@Finset.filter _ (fun q : galUnramifiedOutside K.1 ℚ̄ S ⧸ U =>
     ∃ x : galUnramifiedOutside K.1 ℚ̄ S, (x : galUnramifiedOutside K.1 ℚ̄ S ⧸ U) = q ∧ φ x ≠ 0) (fun _ => Classical.propDecidable _) Finset.univ).card
     using Nat.strong_induction_on with n ih generalizing φ
-  by_cases h0 : ∀ x, φ x = 0
+  rcases Classical.em (∀ x, φ x = 0) with h0 | h0
   · have : φ = 0 := funext h0
     rw [this, Pi.single_zero]
     exact good_zero ℓ
@@ -300,7 +300,7 @@ theorem good_single_of_base {ℓ : ℕ} (v : {v : HeightOneSpectrum (𝓞 K.1) /
           exact absurd (hφD z hz u hu ▸ hφx) hx₀
         · rfl
       simp [hψ, hφx, this]
-    · have := hsub (Finset.mem_filter.2 ⟨Finset.mem_univ _, x₀, rfl, hx₀⟩)
+    · have := hsub ((@Finset.mem_filter _ _ (fun _ => Classical.propDecidable _) _ _).2 ⟨Finset.mem_univ _, x₀, rfl, hx₀⟩)
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at this
       obtain ⟨x, hx, hψx⟩ := this
       obtain ⟨u, hu, rfl⟩ : ∃ u ∈ U, x = x₀ * u := by
@@ -610,7 +610,7 @@ theorem exists_coprime_smul_picInfRep (ℓ : ℕ) (hℓ : ℓ.Prime)
       galUnramifiedOutside K.1 ℚ̄ S → ℤ) := by
     have hf := (mem_divFun _ _).1 f.2
     rw [eq_sum_single (f : {v : HeightOneSpectrum (𝓞 K.1) // v ∉ S} → galUnramifiedOutside K.1 ℚ̄ S → ℤ)
-      hf.1.toFinset (fun v hv => by simpa using hv)]
+      hf.1.toFinset (fun v hv => Classical.byContradiction fun h => hv (hf.1.mem_toFinset.mpr h))]
     refine good_sum _ _ fun v _ => ?_
     exact good_single (fun v L _ _ => good_base ℓ hℓ hS v L) v _ (hf.2 v).1 (hf.2 v).2
   obtain ⟨N, hN, y, hy⟩ := hgood
